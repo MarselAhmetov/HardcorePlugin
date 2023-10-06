@@ -2,6 +2,7 @@ package team404;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.*;
+import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +14,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import team404.RandomMaterial.RandomMaterialTier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +48,7 @@ public class StickListener implements Listener {
             List<String> lore = new ArrayList<>();
             lore.add(TextUtils.greenText("Required Materials:"));
 
-            for (Pair<Integer, Material> pair : loadRequiredMaterials()) {
+            for (Pair<Integer, Material> pair : loadRequiredMaterials(getMaterialTier(player))) {
                 String name = new ItemStack(pair.getRight()).getI18NDisplayName();
                 if (checkMaterialInInventory(player, pair)) {
                     lore.add(TextUtils.appendCheckMark(name + " " + pair.getLeft()));
@@ -76,13 +78,23 @@ public class StickListener implements Listener {
         return count >= requiredAmount;
     }
 
-    public List<Pair<Integer, Material>> loadRequiredMaterials() {
-        // make random select of materials
-        return List.of(
-                Pair.of(1, Material.DIAMOND),
-                Pair.of(2, Material.GOLD_INGOT),
-                Pair.of(3, Material.IRON_INGOT)
-        );
+    private RandomMaterialTier getMaterialTier(Player player) {
+        Advancement hellAdvancement = Bukkit.getAdvancement(NamespacedKey.fromString("story/enter_the_nether"));
+        Advancement endAdvancement = Bukkit.getAdvancement(NamespacedKey.fromString("story/enter_the_end"));
+        if (player.getAdvancementProgress(hellAdvancement).isDone()) {
+            if (player.getAdvancementProgress(endAdvancement).isDone()) {
+                return RandomMaterialTier.END;
+            } else {
+                return RandomMaterialTier.HELL;
+            }
+        } else {
+            return RandomMaterialTier.OVERWORLD;
+        }
+    }
+
+    public List<Pair<Integer, Material>> loadRequiredMaterials(RandomMaterialTier tier) {
+        MaterialGenerator generator = new MaterialGenerator();
+        return generator.getMaterialsList(tier);
     }
 
     @EventHandler
