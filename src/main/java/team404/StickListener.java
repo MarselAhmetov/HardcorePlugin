@@ -1,4 +1,4 @@
-package team404.untitled;
+package team404;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.*;
@@ -16,8 +16,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static team404.untitled.TextUtils.*;
 
 public class StickListener implements Listener {
 
@@ -46,14 +44,14 @@ public class StickListener implements Listener {
             skullMeta.setOwningPlayer(onlinePlayer);
 
             List<String> lore = new ArrayList<>();
-            lore.add(greenText("Required Materials:"));
+            lore.add(TextUtils.greenText("Required Materials:"));
 
             for (Pair<Integer, Material> pair : loadRequiredMaterials()) {
                 String name = new ItemStack(pair.getRight()).getI18NDisplayName();
                 if (checkMaterialInInventory(player, pair)) {
-                    lore.add(appendCheckMark(name + " " + pair.getLeft()));
+                    lore.add(TextUtils.appendCheckMark(name + " " + pair.getLeft()));
                 } else {
-                    lore.add(appendCross(name + " " + pair.getLeft()));
+                    lore.add(TextUtils.appendCross(name + " " + pair.getLeft()));
                 }
             }
 

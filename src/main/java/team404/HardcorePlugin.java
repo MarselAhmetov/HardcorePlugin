@@ -1,4 +1,4 @@
-package team404.untitled;
+package team404;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
