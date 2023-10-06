@@ -1,0 +1,4 @@
+name: untitled
+version: '${project.version}'
+main: team404.untitled.Untitled
+api-version: '1.20'
