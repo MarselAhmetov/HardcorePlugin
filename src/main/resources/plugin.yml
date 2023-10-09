@@ -1,4 +1,4 @@
 name: hardcore-plugin
 version: '${project.version}'
-main: team404.untitled.HardcorePlugin
+main: team404.HardcorePlugin
 api-version: '1.20'

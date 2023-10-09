@@ -1,7 +1,11 @@
 package team404;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import team404.models.MaterialTier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +51,7 @@ public class StickListener implements Listener {
             List<String> lore = new ArrayList<>();
             lore.add(TextUtils.greenText("Required Materials:"));
 
-            for (Pair<Integer, Material> pair : loadRequiredMaterials()) {
+            for (Pair<Integer, Material> pair : loadRequiredMaterials(getMaterialTier(player))) {
                 String name = new ItemStack(pair.getRight()).getI18NDisplayName();
                 if (checkMaterialInInventory(player, pair)) {
                     lore.add(TextUtils.appendCheckMark(name + " " + pair.getLeft()));
@@ -76,13 +81,22 @@ public class StickListener implements Listener {
         return count >= requiredAmount;
     }
 
-    public List<Pair<Integer, Material>> loadRequiredMaterials() {
-        // make random select of materials
-        return List.of(
-                Pair.of(1, Material.DIAMOND),
-                Pair.of(2, Material.GOLD_INGOT),
-                Pair.of(3, Material.IRON_INGOT)
-        );
+    private MaterialTier getMaterialTier(Player player) {
+        Advancement netherAdvancement = Bukkit.getAdvancement(NamespacedKey.fromString("story/enter_the_nether"));
+        Advancement endAdvancement = Bukkit.getAdvancement(NamespacedKey.fromString("story/enter_the_end"));
+
+        if (player.getAdvancementProgress(netherAdvancement).isDone()) {
+            return MaterialTier.NETHER;
+        }
+        if (player.getAdvancementProgress(endAdvancement).isDone()) {
+            return MaterialTier.END;
+        }
+        return MaterialTier.OVER_WORLD;
+    }
+
+    public List<Pair<Integer, Material>> loadRequiredMaterials(MaterialTier tier) {
+        MaterialGenerator generator = new MaterialGenerator();
+        return generator.getMaterialsList(tier);
     }
 
     @EventHandler
@@ -113,23 +127,7 @@ public class StickListener implements Listener {
         player.getWorld().spawnEntity(location, EntityType.VILLAGER);
     }
 
-    private boolean hasAtLeastTenWoodenPlanks(Player player) {
-        int count = 0;
-
-        for (ItemStack item : player.getInventory().getContents()) {
-            if (item != null && isWoodenPlank(item.getType())) {
-                count += item.getAmount();
-                if (count >= 10) {
-                    removePlanks(player, 10);
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private void removePlanks(Player player, int amount) {
+    /*private void removePlanks(Player player, int amount) {
         int remaining = amount;
 
         for (ItemStack item : player.getInventory().getContents()) {
@@ -149,25 +147,6 @@ public class StickListener implements Listener {
                 }
             }
         }
-    }
-
-    private boolean isWoodenPlank(Material material) {
-        switch (material) {
-            case MANGROVE_PLANKS:
-            case BAMBOO_PLANKS:
-            case CHERRY_PLANKS:
-            case OAK_PLANKS:
-            case SPRUCE_PLANKS:
-            case BIRCH_PLANKS:
-            case JUNGLE_PLANKS:
-            case ACACIA_PLANKS:
-            case DARK_OAK_PLANKS:
-            case CRIMSON_PLANKS:
-            case WARPED_PLANKS:
-                return true;
-            default:
-                return false;
-        }
-    }
+    }*/
 }
 
