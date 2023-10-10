@@ -30,6 +30,7 @@ public class StickListener implements Listener {
 
     private final static String INVENTORY_NAME = "Players reincarnation";
     private final static Material MATERIAL_TO_CLICK = Material.STICK;
+    private final static String WORLD_NAME = "world";
 
     private final Map<String, List<Pair<Integer, Material>>> map = new HashMap<>();
 
@@ -141,7 +142,7 @@ public class StickListener implements Listener {
             if (map.containsKey(playerToSpawn.getName())) {
                 map.remove(playerToSpawn.getName());
                 Location location = playerToSpawn.getBedSpawnLocation();
-                playerToSpawn.getPlayer().teleport(location != null ? location : Bukkit.getWorld("world").getSpawnLocation());
+                playerToSpawn.getPlayer().teleport(location != null ? location : Bukkit.getWorld(WORLD_NAME).getSpawnLocation());
                 playerToSpawn.getPlayer().setGameMode(GameMode.SURVIVAL);
             } else {
                 player.sendMessage("Player already revived");
