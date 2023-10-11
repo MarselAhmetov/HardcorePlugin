@@ -1,31 +1,43 @@
 package team404;
 
+import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.advancement.Advancement;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import team404.models.MaterialTier;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StickListener implements Listener {
 
-    private final static String INVENTORY_NAME = "Players reincarnation";
+    private final static String INVENTORY_NAME = "Возрождение игроков";
+    private final static int INVENTORY_ROW_SIZE = 9;
     private final static Material MATERIAL_TO_CLICK = Material.STICK;
+    private final static String WORLD_NAME = "world";
+
+    private final Map<String, List<Pair<Integer, Material>>> map = new HashMap<>();
+
+    public StickListener() {
+        // read file and fill map
+    }
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent event) {
@@ -41,30 +53,47 @@ public class StickListener implements Listener {
         player.openInventory(inventory);
     }
 
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        map.put(player.getName(), loadRequiredMaterials(getMaterialTier(player)));
+    }
+
     private Inventory getInventory(Player player) {
-        Inventory inv = Bukkit.createInventory(null, InventoryType.CHEST, INVENTORY_NAME);
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+        Inventory inv = Bukkit.createInventory(null, getInventorySize(), Component.text(INVENTORY_NAME));
+        for (Map.Entry<String, List<Pair<Integer, Material>>> entry : map.entrySet()) {
             ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
-            skullMeta.setOwningPlayer(onlinePlayer);
-
-            List<String> lore = new ArrayList<>();
-            lore.add(TextUtils.greenText("Required Materials:"));
-
-            for (Pair<Integer, Material> pair : loadRequiredMaterials(getMaterialTier(player))) {
-                String name = new ItemStack(pair.getRight()).getI18NDisplayName();
+            skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(entry.getKey()));
+            List<Component> lore = new ArrayList<>();
+            for (Pair<Integer, Material> pair : entry.getValue()) {
+                ItemStack name = new ItemStack(pair.getRight());
                 if (checkMaterialInInventory(player, pair)) {
-                    lore.add(TextUtils.appendCheckMark(name + " " + pair.getLeft()));
+                    lore.add(TextUtils.appendCheckMark(name)
+                            .appendSpace()
+                            .append(Component.text(pair.getLeft())));
                 } else {
-                    lore.add(TextUtils.appendCross(name + " " + pair.getLeft()));
+                    lore.add(TextUtils.appendCross(name)
+                            .appendSpace()
+                            .append(Component.text(pair.getLeft())));
                 }
             }
-
-            skullMeta.setLore(lore);
+            skullMeta.lore(lore);
             playerHead.setItemMeta(skullMeta);
             inv.addItem(playerHead);
         }
         return inv;
+    }
+
+    private int getInventorySize() {
+        if (map.isEmpty()) {
+            return INVENTORY_ROW_SIZE;
+        }
+        int rowsCount = map.size() / INVENTORY_ROW_SIZE;
+        if (map.size() % INVENTORY_ROW_SIZE != 0) {
+            rowsCount++;
+        }
+        return rowsCount * INVENTORY_ROW_SIZE;
     }
 
     private boolean checkMaterialInInventory(Player player, Pair<Integer, Material> material) {
@@ -79,6 +108,15 @@ public class StickListener implements Listener {
         }
 
         return count >= requiredAmount;
+    }
+
+    public boolean checkMaterialInInventory(Player player, List<Pair<Integer, Material>> materials) {
+        for (Pair<Integer, Material> material : materials) {
+            if (!checkMaterialInInventory(player, material)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private MaterialTier getMaterialTier(Player player) {
@@ -114,26 +152,46 @@ public class StickListener implements Listener {
         Player player = (Player) event.getWhoClicked();
 
         if (clickedItem.getType() == Material.PLAYER_HEAD) {
-            Player playerToSpawn = ((SkullMeta) clickedItem.getItemMeta()).getOwningPlayer().getPlayer();
-            spawnPlayer(playerToSpawn.getPlayer(), player);
+            OfflinePlayer playerToSpawn = ((SkullMeta) clickedItem.getItemMeta()).getOwningPlayer();
+            List<Pair<Integer, Material>> materials = map.get(playerToSpawn.getName());
+            if (checkMaterialInInventory(player, materials)) {
+                spawnPlayer(playerToSpawn, player);
+                removeItems(player, materials);
+            } else {
+                player.sendMessage("У вас не хватает ресурсов");
+            }
         }
-
         event.setCancelled(true); // Prevents taking items from the inventory
     }
 
-    private void spawnPlayer(Player playerToSpawn, Player player) {
-        // spawn player instead of villager
-        Location location = player.getLocation().add(1, 0, 0); // Adjust the spawn location as needed
-        player.getWorld().spawnEntity(location, EntityType.VILLAGER);
+    private void spawnPlayer(OfflinePlayer playerToSpawn, Player player) {
+        if (playerToSpawn.isOnline()) {
+            if (map.containsKey(playerToSpawn.getName())) {
+                map.remove(playerToSpawn.getName());
+                Location location = playerToSpawn.getBedSpawnLocation();
+                playerToSpawn.getPlayer().teleport(location != null ? location : Bukkit.getWorld(WORLD_NAME).getSpawnLocation());
+                playerToSpawn.getPlayer().setGameMode(GameMode.SURVIVAL);
+            } else {
+                player.sendMessage("Игрок уже возрожден");
+            }
+        } else {
+            player.sendMessage("Игрок не на сервере");
+        }
+        player.closeInventory();
     }
 
-    /*private void removePlanks(Player player, int amount) {
-        int remaining = amount;
+    private void removeItems(Player player, List<Pair<Integer, Material>> itemsList) {
+        for (Pair<Integer, Material> amountMaterialPair : itemsList) {
+            removeItems(player, amountMaterialPair);
+        }
+    }
+
+    private void removeItems(Player player, Pair<Integer, Material> itemToRemove) {
+        int remaining = itemToRemove.getLeft();
 
         for (ItemStack item : player.getInventory().getContents()) {
-            if (item != null && isWoodenPlank(item.getType())) {
+            if (item != null && item.getType().equals(itemToRemove.getRight())) {
                 int inStack = item.getAmount();
-
                 if (inStack > remaining) {
                     item.setAmount(inStack - remaining);
                     return;
@@ -141,12 +199,11 @@ public class StickListener implements Listener {
                     player.getInventory().remove(item);
                     remaining -= inStack;
                 }
-
                 if (remaining <= 0) {
                     return;
                 }
             }
         }
-    }*/
+    }
 }
 
