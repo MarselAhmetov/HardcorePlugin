@@ -152,15 +152,11 @@ public class StickListener implements Listener {
                 !event.getView().title().contains(Component.text(INVENTORY_NAME))) {
             return;
         }
-
         ItemStack clickedItem = event.getCurrentItem();
-
         if (clickedItem == null) {
             return;
         }
-
         Player player = (Player) event.getWhoClicked();
-
         if (clickedItem.getType() == Material.PLAYER_HEAD) {
             OfflinePlayer playerToSpawn = ((SkullMeta) clickedItem.getItemMeta()).getOwningPlayer();
             List<Pair<Integer, Material>> materials = map.get(playerToSpawn.getName());
@@ -193,13 +189,14 @@ public class StickListener implements Listener {
         event.setCancelled(true); // Prevents taking items from the inventory
     }
 
-    private void spawnPlayer(OfflinePlayer playerToSpawn, Player player) {
-        if (playerToSpawn.isOnline()) {
-            if (map.containsKey(playerToSpawn.getName())) {
-                map.remove(playerToSpawn.getName());
-                Location location = playerToSpawn.getBedSpawnLocation();
-                playerToSpawn.getPlayer().teleport(location != null ? location : Bukkit.getWorld(WORLD_NAME).getSpawnLocation());
-                playerToSpawn.getPlayer().setGameMode(GameMode.SURVIVAL);
+    private void spawnPlayer(OfflinePlayer offlinePlayerToSpawn, Player player) {
+        if (offlinePlayerToSpawn.isOnline()) {
+            if (map.containsKey(offlinePlayerToSpawn.getName())) {
+                map.remove(offlinePlayerToSpawn.getName());
+                Location location = offlinePlayerToSpawn.getBedSpawnLocation();
+                Player playerToSpawn = offlinePlayerToSpawn.getPlayer();
+                playerToSpawn.teleport(location != null ? location : Bukkit.getWorld(WORLD_NAME).getSpawnLocation());
+                playerToSpawn.setGameMode(GameMode.SURVIVAL);
             } else {
                 player.sendMessage(PLAYER_ALREADY_REVIVED);
             }
