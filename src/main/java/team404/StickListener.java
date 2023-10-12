@@ -5,7 +5,6 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,7 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.w3c.dom.Text;
+import team404.constants.ColorHexConstants;
 import team404.models.MaterialTier;
 
 import java.util.ArrayList;
@@ -32,17 +31,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static team404.constants.InventoryConstants.INVENTORY_NAME;
+import static team404.constants.InventoryConstants.INVENTORY_ROW_SIZE;
+import static team404.constants.MessagesConstants.*;
+
 public class StickListener implements Listener {
 
-    private final static String INVENTORY_NAME = "Возрождение игроков";
-    private final static int INVENTORY_ROW_SIZE = 9;
     private final static Material MATERIAL_TO_CLICK = Material.STICK;
     private final static String WORLD_NAME = "world";
-    private final static int SECONDS_BEFORE_RESPAWN = 5;
 
     private final Map<String, List<Pair<Integer, Material>>> map = new HashMap<>();
 
-    private HardcorePlugin plugin;
+    private final HardcorePlugin plugin;
 
     public StickListener(HardcorePlugin plugin) {
         this.plugin = plugin;
@@ -148,7 +148,8 @@ public class StickListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player) || !event.getView().getTitle().equals(INVENTORY_NAME)) {
+        if (!(event.getWhoClicked() instanceof Player) ||
+                !event.getView().title().contains(Component.text(INVENTORY_NAME))) {
             return;
         }
 
@@ -171,7 +172,12 @@ public class StickListener implements Listener {
                         int currentCounter = counter.getAndDecrement();
                         playerToSpawn.getPlayer().clearTitle();
                         if (currentCounter > 0) {
-                            playerToSpawn.getPlayer().showTitle(Title.title(Component.text(String.format("Вы будете воскрешены через %s сек...", currentCounter)), Component.empty()));
+                            playerToSpawn.getPlayer().showTitle(
+                                    Title.title(
+                                            Component.text(YOU_WILL_BE_REVIVED_IN.formatted(currentCounter)),
+                                            Component.empty()
+                                    )
+                            );
                         } else {
                             spawnPlayer(playerToSpawn, player);
                             removeItems(player, materials);
@@ -180,7 +186,8 @@ public class StickListener implements Listener {
                     }
                 }.runTaskTimer(plugin, 0, 20);
             } else {
-                player.sendMessage(Component.text("У вас не хватает ресурсов").color(TextColor.fromHexString(ColorHexConstants.RED_HEX)));
+                player.sendMessage(Component.text(NOT_ENOUGH_RESOURCES)
+                        .color(TextColor.fromHexString(ColorHexConstants.RED_HEX)));
             }
         }
         event.setCancelled(true); // Prevents taking items from the inventory
@@ -194,10 +201,10 @@ public class StickListener implements Listener {
                 playerToSpawn.getPlayer().teleport(location != null ? location : Bukkit.getWorld(WORLD_NAME).getSpawnLocation());
                 playerToSpawn.getPlayer().setGameMode(GameMode.SURVIVAL);
             } else {
-                player.sendMessage("Игрок уже возрожден");
+                player.sendMessage(PLAYER_ALREADY_REVIVED);
             }
         } else {
-            player.sendMessage("Игрок не на сервере");
+            player.sendMessage(PLAYER_NOT_ON_SERVER);
         }
         player.closeInventory();
     }

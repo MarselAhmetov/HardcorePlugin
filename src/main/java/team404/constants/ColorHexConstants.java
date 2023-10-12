@@ -1,4 +1,4 @@
-package team404;
+package team404.constants;
 
 public class ColorHexConstants {
     public static final String GREEN_HEX = "#00FF00";
