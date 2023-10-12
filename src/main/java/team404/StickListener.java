@@ -1,6 +1,8 @@
 package team404;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.title.Title;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,6 +23,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.w3c.dom.Text;
 import team404.models.MaterialTier;
 
 import java.util.ArrayList;
@@ -168,8 +171,7 @@ public class StickListener implements Listener {
                         int currentCounter = counter.getAndDecrement();
                         playerToSpawn.getPlayer().clearTitle();
                         if (currentCounter > 0) {
-
-                            playerToSpawn.getPlayer().sendTitle(String.format("Вы будете воскрешены через %s сек...", currentCounter), null);
+                            playerToSpawn.getPlayer().showTitle(Title.title(Component.text(String.format("Вы будете воскрешены через %s сек...", currentCounter)), Component.empty()));
                         } else {
                             spawnPlayer(playerToSpawn, player);
                             removeItems(player, materials);
@@ -178,7 +180,7 @@ public class StickListener implements Listener {
                     }
                 }.runTaskTimer(plugin, 0, 20);
             } else {
-                player.sendMessage(ChatColor.RED + "У вас не хватает ресурсов");
+                player.sendMessage(Component.text("У вас не хватает ресурсов").color(TextColor.fromHexString(ColorHexConstants.RED_HEX)));
             }
         }
         event.setCancelled(true); // Prevents taking items from the inventory
