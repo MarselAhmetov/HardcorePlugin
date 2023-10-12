@@ -8,6 +8,7 @@ public final class HardcorePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         Bukkit.addRecipe(Recipes.getReviveStuffRecipe(this));
-        getServer().getPluginManager().registerEvents(new StickListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerRespawnListener(), this);
+        getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
     }
 }
