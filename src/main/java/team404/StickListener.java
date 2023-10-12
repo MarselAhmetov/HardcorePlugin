@@ -1,8 +1,11 @@
 package team404;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.title.Title;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,12 +22,15 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.w3c.dom.Text;
 import team404.models.MaterialTier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class StickListener implements Listener {
 
@@ -32,11 +38,14 @@ public class StickListener implements Listener {
     private final static int INVENTORY_ROW_SIZE = 9;
     private final static Material MATERIAL_TO_CLICK = Material.STICK;
     private final static String WORLD_NAME = "world";
+    private final static int SECONDS_BEFORE_RESPAWN = 5;
 
     private final Map<String, List<Pair<Integer, Material>>> map = new HashMap<>();
 
-    public StickListener() {
-        // read file and fill map
+    private HardcorePlugin plugin;
+
+    public StickListener(HardcorePlugin plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -155,10 +164,23 @@ public class StickListener implements Listener {
             OfflinePlayer playerToSpawn = ((SkullMeta) clickedItem.getItemMeta()).getOwningPlayer();
             List<Pair<Integer, Material>> materials = map.get(playerToSpawn.getName());
             if (checkMaterialInInventory(player, materials)) {
-                spawnPlayer(playerToSpawn, player);
-                removeItems(player, materials);
+                final AtomicInteger counter = new AtomicInteger(SECONDS_BEFORE_RESPAWN);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        int currentCounter = counter.getAndDecrement();
+                        playerToSpawn.getPlayer().clearTitle();
+                        if (currentCounter > 0) {
+                            playerToSpawn.getPlayer().showTitle(Title.title(Component.text(String.format("Вы будете воскрешены через %s сек...", currentCounter)), Component.empty()));
+                        } else {
+                            spawnPlayer(playerToSpawn, player);
+                            removeItems(player, materials);
+                            cancel();
+                        }
+                    }
+                }.runTaskTimer(plugin, 0, 20);
             } else {
-                player.sendMessage("У вас не хватает ресурсов");
+                player.sendMessage(Component.text("У вас не хватает ресурсов").color(TextColor.fromHexString(ColorHexConstants.RED_HEX)));
             }
         }
         event.setCancelled(true); // Prevents taking items from the inventory
