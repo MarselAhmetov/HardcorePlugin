@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import team404.constants.ColorHexConstants;
+import team404.models.Recipes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +36,7 @@ import static team404.constants.InventoryConstants.INVENTORY_ROW_SIZE;
 import static team404.constants.MessagesConstants.*;
 
 public class InventoryListener implements Listener {
-
-    private final static Material MATERIAL_TO_CLICK = Material.STICK;
     private final static String WORLD_NAME = "world";
-
     private final HardcorePlugin plugin;
 
     public InventoryListener(HardcorePlugin plugin) {
@@ -59,7 +57,7 @@ public class InventoryListener implements Listener {
             return;
         }
         ItemStack item = event.getItem();
-        if (item == null || item.getType() != MATERIAL_TO_CLICK) {
+        if (!Recipes.isReviveStuff(item)) {
             return;
         }
         Player player = event.getPlayer();
