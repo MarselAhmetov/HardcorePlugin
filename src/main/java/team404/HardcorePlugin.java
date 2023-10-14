@@ -10,9 +10,18 @@ import static team404.DevCommandExecutor.GET_STICK_COMMAND;
 public final class HardcorePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
-        Bukkit.addRecipe(Recipes.getReviveStuffRecipe(this));
+        registerEvents();
+        registerRecipes();
+        registerCommands();
+    }
+
+    public void registerEvents() {
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(), this);
-        getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+        getServer().getPluginManager().registerEvents(new InventoryListener(this), this);}
+    public void registerRecipes() {
+        Bukkit.addRecipe(Recipes.getReviveStuffRecipe(this));
+    }
+    public void registerCommands() {
         var commandExecutor = new DevCommandExecutor();
         getCommand(GET_RESOURCES_COMMAND).setExecutor(commandExecutor);
         getCommand(GET_STICK_COMMAND).setExecutor(commandExecutor);

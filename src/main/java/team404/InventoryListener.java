@@ -32,11 +32,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static team404.PlayerToReviveStore.respawnablePlayers;
 import static team404.PlayerToReviveStore.playersToSpawn;
 import static team404.constants.InventoryConstants.INVENTORY_NAME;
-import static team404.constants.InventoryConstants.INVENTORY_ROW_SIZE;
 import static team404.constants.MessagesConstants.*;
 
 public class InventoryListener implements Listener {
-    private final static String WORLD_NAME = "world";
+    private static final String WORLD_NAME = "world";
+    private static final int SECONDS_BEFORE_RESPAWN = 5;
+    private static final int INVENTORY_ROW_SIZE = 9;
     private final HardcorePlugin plugin;
 
     public InventoryListener(HardcorePlugin plugin) {
