@@ -3,6 +3,7 @@ package team404;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.translation.Translatable;
+import team404.constants.ColorHexConstants;
 
 public class TextUtils {
     public static Component appendCheckMark(Translatable text) {

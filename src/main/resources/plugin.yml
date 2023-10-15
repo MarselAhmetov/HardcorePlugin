@@ -2,3 +2,10 @@ name: hardcore-plugin
 version: '${project.version}'
 main: team404.HardcorePlugin
 api-version: '1.20'
+commands:
+  dev:
+    description: Get all items to revive players
+    usage: /<command>
+  stick:
+    description: Get stick for reviving players
+    usage: /<command>

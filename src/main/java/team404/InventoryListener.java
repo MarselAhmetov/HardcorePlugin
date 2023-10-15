@@ -2,50 +2,54 @@ package team404;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.w3c.dom.Text;
-import team404.models.MaterialTier;
+import team404.constants.ColorHexConstants;
+import team404.models.Recipes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class StickListener implements Listener {
+import static team404.PlayerToReviveStore.respawnablePlayers;
+import static team404.PlayerToReviveStore.playersToSpawn;
+import static team404.constants.InventoryConstants.INVENTORY_NAME;
+import static team404.constants.MessagesConstants.*;
 
-    private final static String INVENTORY_NAME = "Возрождение игроков";
-    private final static int INVENTORY_ROW_SIZE = 9;
-    private final static Material MATERIAL_TO_CLICK = Material.STICK;
-    private final static String WORLD_NAME = "world";
-    private final static int SECONDS_BEFORE_RESPAWN = 5;
+public class InventoryListener implements Listener {
+    private static final String WORLD_NAME = "world";
+    private static final int SECONDS_BEFORE_RESPAWN = 5;
+    private static final int INVENTORY_ROW_SIZE = 9;
+    private final HardcorePlugin plugin;
 
-    private final Map<String, List<Pair<Integer, Material>>> map = new HashMap<>();
-
-    private HardcorePlugin plugin;
-
-    public StickListener(HardcorePlugin plugin) {
+    public InventoryListener(HardcorePlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        OfflinePlayer player = event.getPlayer();
+        if (playersToSpawn.contains(player.getName())) {
+            respawnPlayer(player);
+        }
     }
 
     @EventHandler
@@ -54,7 +58,7 @@ public class StickListener implements Listener {
             return;
         }
         ItemStack item = event.getItem();
-        if (item == null || item.getType() != MATERIAL_TO_CLICK) {
+        if (!Recipes.isReviveStuff(item)) {
             return;
         }
         Player player = event.getPlayer();
@@ -62,15 +66,9 @@ public class StickListener implements Listener {
         player.openInventory(inventory);
     }
 
-    @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-        map.put(player.getName(), loadRequiredMaterials(getMaterialTier(player)));
-    }
-
     private Inventory getInventory(Player player) {
         Inventory inv = Bukkit.createInventory(null, getInventorySize(), Component.text(INVENTORY_NAME));
-        for (Map.Entry<String, List<Pair<Integer, Material>>> entry : map.entrySet()) {
+        for (Map.Entry<String, List<Pair<Integer, Material>>> entry : respawnablePlayers.entrySet()) {
             ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
             skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(entry.getKey()));
@@ -95,11 +93,11 @@ public class StickListener implements Listener {
     }
 
     private int getInventorySize() {
-        if (map.isEmpty()) {
+        if (respawnablePlayers.isEmpty()) {
             return INVENTORY_ROW_SIZE;
         }
-        int rowsCount = map.size() / INVENTORY_ROW_SIZE;
-        if (map.size() % INVENTORY_ROW_SIZE != 0) {
+        int rowsCount = respawnablePlayers.size() / INVENTORY_ROW_SIZE;
+        if (respawnablePlayers.size() % INVENTORY_ROW_SIZE != 0) {
             rowsCount++;
         }
         return rowsCount * INVENTORY_ROW_SIZE;
@@ -120,6 +118,9 @@ public class StickListener implements Listener {
     }
 
     public boolean checkMaterialInInventory(Player player, List<Pair<Integer, Material>> materials) {
+        if (materials == null) {
+            return false;
+        }
         for (Pair<Integer, Material> material : materials) {
             if (!checkMaterialInInventory(player, material)) {
                 return false;
@@ -128,78 +129,80 @@ public class StickListener implements Listener {
         return true;
     }
 
-    private MaterialTier getMaterialTier(Player player) {
-        Advancement netherAdvancement = Bukkit.getAdvancement(NamespacedKey.fromString("story/enter_the_nether"));
-        Advancement endAdvancement = Bukkit.getAdvancement(NamespacedKey.fromString("story/enter_the_end"));
-
-        if (player.getAdvancementProgress(netherAdvancement).isDone()) {
-            return MaterialTier.NETHER;
-        }
-        if (player.getAdvancementProgress(endAdvancement).isDone()) {
-            return MaterialTier.END;
-        }
-        return MaterialTier.OVER_WORLD;
-    }
-
-    public List<Pair<Integer, Material>> loadRequiredMaterials(MaterialTier tier) {
-        MaterialGenerator generator = new MaterialGenerator();
-        return generator.getMaterialsList(tier);
-    }
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player) || !event.getView().getTitle().equals(INVENTORY_NAME)) {
+        if (!(event.getWhoClicked() instanceof Player player) ||
+                !PlainTextComponentSerializer.plainText().serialize(event.getView().title()).equals(INVENTORY_NAME)) {
             return;
         }
-
         ItemStack clickedItem = event.getCurrentItem();
-
         if (clickedItem == null) {
             return;
         }
-
-        Player player = (Player) event.getWhoClicked();
-
-        if (clickedItem.getType() == Material.PLAYER_HEAD) {
-            OfflinePlayer playerToSpawn = ((SkullMeta) clickedItem.getItemMeta()).getOwningPlayer();
-            List<Pair<Integer, Material>> materials = map.get(playerToSpawn.getName());
-            if (checkMaterialInInventory(player, materials)) {
-                final AtomicInteger counter = new AtomicInteger(SECONDS_BEFORE_RESPAWN);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        int currentCounter = counter.getAndDecrement();
-                        playerToSpawn.getPlayer().clearTitle();
-                        if (currentCounter > 0) {
-                            playerToSpawn.getPlayer().showTitle(Title.title(Component.text(String.format("Вы будете воскрешены через %s сек...", currentCounter)), Component.empty()));
-                        } else {
-                            spawnPlayer(playerToSpawn, player);
-                            removeItems(player, materials);
-                            cancel();
-                        }
-                    }
-                }.runTaskTimer(plugin, 0, 20);
-            } else {
-                player.sendMessage(Component.text("У вас не хватает ресурсов").color(TextColor.fromHexString(ColorHexConstants.RED_HEX)));
-            }
-        }
         event.setCancelled(true); // Prevents taking items from the inventory
+        // check that head clicked
+        if (clickedItem.getType() != Material.PLAYER_HEAD) {
+            return;
+        }
+
+        OfflinePlayer offlinePlayerToSpawn = ((SkullMeta) clickedItem.getItemMeta()).getOwningPlayer();
+        // check that player not revived yet
+        if (!respawnablePlayers.containsKey(offlinePlayerToSpawn.getName())) {
+            player.sendMessage(PLAYER_ALREADY_REVIVED);
+            return;
+        }
+        // check that player who clicked has enough materials
+        List<Pair<Integer, Material>> materials = respawnablePlayers.get(offlinePlayerToSpawn.getName());
+        if (!checkMaterialInInventory(player, materials)) {
+            player.sendMessage(Component.text(NOT_ENOUGH_RESOURCES)
+                    .color(TextColor.fromHexString(ColorHexConstants.RED_HEX)));
+            return;
+        }
+        // add player to spawn map
+        respawnablePlayers.remove(offlinePlayerToSpawn.getName());
+        playersToSpawn.add(offlinePlayerToSpawn.getName());
+        player.sendMessage(
+                Component.text(PLAYER_REVIVED.formatted(offlinePlayerToSpawn.getName()))
+                        .color(TextColor.fromHexString(ColorHexConstants.GREEN_HEX))
+        );
+        player.closeInventory();
+        removeItems(player, materials);
+        // try respawn
+        respawnPlayer(offlinePlayerToSpawn);
     }
 
-    private void spawnPlayer(OfflinePlayer playerToSpawn, Player player) {
-        if (playerToSpawn.isOnline()) {
-            if (map.containsKey(playerToSpawn.getName())) {
-                map.remove(playerToSpawn.getName());
-                Location location = playerToSpawn.getBedSpawnLocation();
-                playerToSpawn.getPlayer().teleport(location != null ? location : Bukkit.getWorld(WORLD_NAME).getSpawnLocation());
-                playerToSpawn.getPlayer().setGameMode(GameMode.SURVIVAL);
-            } else {
-                player.sendMessage("Игрок уже возрожден");
-            }
-        } else {
-            player.sendMessage("Игрок не на сервере");
+    private void respawnPlayer(OfflinePlayer offlinePlayer) {
+        final AtomicInteger counter = new AtomicInteger(SECONDS_BEFORE_RESPAWN);
+        if (!offlinePlayer.isOnline()) {
+            return;
         }
-        player.closeInventory();
+        Player player = offlinePlayer.getPlayer();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                int currentCounter = counter.getAndDecrement();
+                player.clearTitle();
+                if (currentCounter > 0) {
+                    player.showTitle(
+                            Title.title(
+                                    Component.text(YOU_WILL_BE_REVIVED_IN.formatted(currentCounter)),
+                                    Component.empty()
+                            )
+                    );
+                } else {
+                    // check that player is online
+                    if (offlinePlayer.isOnline()) {
+                        // if online teleport and set gamemode and remove from to spawn list
+                        Location location = offlinePlayer.getBedSpawnLocation();
+                        player.teleport(location != null ? location : Bukkit.getWorld(WORLD_NAME).getSpawnLocation());
+                        player.setGameMode(GameMode.SURVIVAL);
+                        playersToSpawn.remove(player.getName());
+                    }
+                    // if not do nothing
+                    cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 0, 20);
     }
 
     private void removeItems(Player player, List<Pair<Integer, Material>> itemsList) {
