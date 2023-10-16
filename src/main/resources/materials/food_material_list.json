@@ -1,0 +1,136 @@
+{
+  "foodMaterialList": [
+    {
+      "material": "CARROT",
+      "lowerThreshold": 10,
+      "upperThreshold": 15,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "APPLE",
+      "lowerThreshold": 10,
+      "upperThreshold": 15,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "SWEET_BERRIES",
+      "lowerThreshold": 10,
+      "upperThreshold": 15,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "BAKED_POTATO",
+      "lowerThreshold": 10,
+      "upperThreshold": 15,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "BEETROOT",
+      "lowerThreshold": 10,
+      "upperThreshold": 15,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "BREAD",
+      "lowerThreshold": 10,
+      "upperThreshold": 15,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "MELON",
+      "lowerThreshold": 1,
+      "upperThreshold": 5,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "PUMPKIN",
+      "lowerThreshold": 1,
+      "upperThreshold": 5,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "COOKED_PORKCHOP",
+      "lowerThreshold": 5,
+      "upperThreshold": 10,
+      "tier": "NETHER"
+    },
+    {
+      "material": "COOKED_BEEF",
+      "lowerThreshold": 5,
+      "upperThreshold": 10,
+      "tier": "NETHER"
+    },
+    {
+      "material": "COOKED_CHICKEN",
+      "lowerThreshold": 5,
+      "upperThreshold": 10,
+      "tier": "NETHER"
+    },
+    {
+      "material": "COOKED_RABBIT",
+      "lowerThreshold": 1,
+      "upperThreshold": 3,
+      "tier": "NETHER"
+    },
+    {
+      "material": "GLOW_BERRIES",
+      "lowerThreshold": 5,
+      "upperThreshold": 10,
+      "tier": "NETHER"
+    },
+    {
+      "material": "COOKED_MUTTON",
+      "lowerThreshold": 5,
+      "upperThreshold": 10,
+      "tier": "NETHER"
+    },
+    {
+      "material": "COOKED_COD",
+      "lowerThreshold": 5,
+      "upperThreshold": 10,
+      "tier": "NETHER"
+    },
+    {
+      "material": "COOKED_SALMON",
+      "lowerThreshold": 5,
+      "upperThreshold": 10,
+      "tier": "NETHER"
+    },
+    {
+      "material": "GOLDEN_APPLE",
+      "lowerThreshold": 1,
+      "upperThreshold": 3,
+      "tier": "END"
+    },
+    {
+      "material": "BEETROOT_SOUP",
+      "lowerThreshold": 1,
+      "upperThreshold": 1,
+      "tier": "END"
+    },
+    {
+      "material": "RABBIT_STEW",
+      "lowerThreshold": 1,
+      "upperThreshold": 1,
+      "tier": "END"
+    },
+    {
+      "material": "MUSHROOM_STEW",
+      "lowerThreshold": 1,
+      "upperThreshold": 1,
+      "tier": "END"
+    },
+    {
+      "material": "GOLDEN_CARROT",
+      "lowerThreshold": 1,
+      "upperThreshold": 3,
+      "tier": "END"
+    },
+    {
+      "material": "PUMPKIN_PIE",
+      "lowerThreshold": 1,
+      "upperThreshold": 3,
+      "tier": "END"
+    }
+  ]
+}

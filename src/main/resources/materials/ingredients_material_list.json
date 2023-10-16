@@ -1,0 +1,76 @@
+{
+  "ingredientsMaterialList": [
+    {
+      "material": "BONE",
+      "lowerThreshold": 1,
+      "upperThreshold": 5,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "STRING",
+      "lowerThreshold": 1,
+      "upperThreshold": 5,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "ROTTEN_FLESH",
+      "lowerThreshold": 1,
+      "upperThreshold": 5,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "GUNPOWDER",
+      "lowerThreshold": 1,
+      "upperThreshold": 5,
+      "tier": "OVER_WORLD"
+    },
+    {
+      "material": "FERMENTED_SPIDER_EYE",
+      "lowerThreshold": 1,
+      "upperThreshold": 3,
+      "tier": "NETHER"
+    },
+    {
+      "material": "BLAZE_ROD",
+      "lowerThreshold": 1,
+      "upperThreshold": 3,
+      "tier": "NETHER"
+    },
+    {
+      "material": "GOLD_NUGGET",
+      "lowerThreshold": 5,
+      "upperThreshold": 15,
+      "tier": "NETHER"
+    },
+    {
+      "material": "GLOWSTONE",
+      "lowerThreshold": 5,
+      "upperThreshold": 15,
+      "tier": "NETHER"
+    },
+    {
+      "material": "MAGMA_CREAM",
+      "lowerThreshold": 5,
+      "upperThreshold": 15,
+      "tier": "NETHER"
+    },
+    {
+      "material": "ENDER_PEARL",
+      "lowerThreshold": 1,
+      "upperThreshold": 3,
+      "tier": "END"
+    },
+    {
+      "material": "PRISMARINE_SHARD",
+      "lowerThreshold": 1,
+      "upperThreshold": 5,
+      "tier": "END"
+    },
+    {
+      "material": "PRISMARINE_CRYSTALS",
+      "lowerThreshold": 1,
+      "upperThreshold": 5,
+      "tier": "END"
+    }
+  ]
+}
