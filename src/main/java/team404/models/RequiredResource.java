@@ -1,19 +1,14 @@
 package team404.models;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bukkit.Material;
 
-@Getter
+@Data
+@NoArgsConstructor
 public class RequiredResource {
-    private final Material material;
-    private final int lowerThreshold;
-    private final int upperThreshold;
-    private final MaterialTier tier;
-
-    public RequiredResource(Material material, int lowerThreshold, int upperThreshold, MaterialTier tier) {
-        this.material = material;
-        this.lowerThreshold = lowerThreshold;
-        this.upperThreshold = upperThreshold;
-        this.tier = tier;
-    }
+    private Material material;
+    private int lowerThreshold;
+    private int upperThreshold;
+    private MaterialTier tier;
 }

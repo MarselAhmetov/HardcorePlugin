@@ -15,20 +15,24 @@ public final class HardcorePlugin extends JavaPlugin {
         registerEvents();
         registerRecipes();
         registerCommands();
+        createConfigFiles();
+        MaterialLoader.loadMaterials(this.getDataFolder());
+    }
+
+    private void createConfigFiles() {
         saveDefaultConfig();
         saveResource("materials/valuable_material_list.json", false);
         saveResource("materials/food_material_list.json", false);
         saveResource("materials/nature_material_list.json", false);
         saveResource("materials/ingredients_material_list.json", false);
     }
-
-    public void registerEvents() {
+    private void registerEvents() {
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);}
-    public void registerRecipes() {
+    private void registerRecipes() {
         Bukkit.addRecipe(Recipes.getReviveStuffRecipe(this));
     }
-    public void registerCommands() {
+    private void registerCommands() {
         var commandExecutor = new DevCommandExecutor();
         Optional.ofNullable(getCommand(GET_RESOURCES_COMMAND))
                 .ifPresent(it -> it.setExecutor(commandExecutor));
