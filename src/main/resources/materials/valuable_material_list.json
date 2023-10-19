@@ -1,0 +1,104 @@
+[
+  {
+    "material": "COPPER_INGOT",
+    "lowerThreshold": 1,
+    "upperThreshold": 10,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "COPPER_INGOT",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "NETHER"
+  },
+  {
+    "material": "COPPER_INGOT",
+    "lowerThreshold": 20,
+    "upperThreshold": 32,
+    "tier": "END"
+  },
+  {
+    "material": "COAL",
+    "lowerThreshold": 1,
+    "upperThreshold": 10,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "COAL",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "NETHER"
+  },
+  {
+    "material": "COAL",
+    "lowerThreshold": 20,
+    "upperThreshold": 32,
+    "tier": "END"
+  },
+  {
+    "material": "IRON_INGOT",
+    "lowerThreshold": 1,
+    "upperThreshold": 10,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "IRON_INGOT",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "NETHER"
+  },
+  {
+    "material": "IRON_INGOT",
+    "lowerThreshold": 20,
+    "upperThreshold": 32,
+    "tier": "END"
+  },
+  {
+    "material": "GOLD_INGOT",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "GOLD_INGOT",
+    "lowerThreshold": 5,
+    "upperThreshold": 10,
+    "tier": "NETHER"
+  },
+  {
+    "material": "GOLD_INGOT",
+    "lowerThreshold": 10,
+    "upperThreshold": 15,
+    "tier": "END"
+  },
+  {
+    "material": "DIAMOND",
+    "lowerThreshold": 1,
+    "upperThreshold": 3,
+    "tier": "NETHER"
+  },
+  {
+    "material": "DIAMOND",
+    "lowerThreshold": 3,
+    "upperThreshold": 5,
+    "tier": "END"
+  },
+  {
+    "material": "EMERALD",
+    "lowerThreshold": 1,
+    "upperThreshold": 3,
+    "tier": "NETHER"
+  },
+  {
+    "material": "EMERALD",
+    "lowerThreshold": 3,
+    "upperThreshold": 5,
+    "tier": "END"
+  },
+  {
+    "material": "NETHERITE_INGOT",
+    "lowerThreshold": 1,
+    "upperThreshold": 2,
+    "tier": "END"
+  }
+]

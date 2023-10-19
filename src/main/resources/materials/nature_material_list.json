@@ -1,0 +1,188 @@
+[
+  {
+    "material": "BAMBOO",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "SUGAR_CANE",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "CACTUS",
+    "lowerThreshold": 3,
+    "upperThreshold": 10,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "ACACIA_LOG",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "BIRCH_LOG",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "OAK_LOG",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "SPRUCE_LOG",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "CRIMSON_STEM",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "NETHER"
+  },
+  {
+    "material": "WARPED_STEM",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "NETHER"
+  },
+  {
+    "material": "DARK_OAK_LOG",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "NETHER"
+  },
+  {
+    "material": "JUNGLE_LOG",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "NETHER"
+  },
+  {
+    "material": "CHERRY_LOG",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "END"
+  },
+  {
+    "material": "MANGROVE_LOG",
+    "lowerThreshold": 10,
+    "upperThreshold": 20,
+    "tier": "END"
+  },
+  {
+    "material": "DANDELION",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "POPPY",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "OVER_WORLD"
+  },
+  {
+    "material": "BLUE_ORCHID",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "NETHER"
+  },
+  {
+    "material": "ALLIUM",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "NETHER"
+  },
+  {
+    "material": "AZURE_BLUET",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "NETHER"
+  },
+  {
+    "material": "RED_TULIP",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "NETHER"
+  },
+  {
+    "material": "ORANGE_TULIP",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "NETHER"
+  },
+  {
+    "material": "WHITE_TULIP",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "NETHER"
+  },
+  {
+    "material": "PINK_TULIP",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "NETHER"
+  },
+  {
+    "material": "OXEYE_DAISY",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "NETHER"
+  },
+  {
+    "material": "CORNFLOWER",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "NETHER"
+  },
+  {
+    "material": "LILY_OF_THE_VALLEY",
+    "lowerThreshold": 1,
+    "upperThreshold": 5,
+    "tier": "NETHER"
+  },
+  {
+    "material": "NETHER_WART",
+    "lowerThreshold": 5,
+    "upperThreshold": 10,
+    "tier": "NETHER"
+  },
+  {
+    "material": "PINK_PETALS",
+    "lowerThreshold": 1,
+    "upperThreshold": 3,
+    "tier": "END"
+  },
+  {
+    "material": "SUNFLOWER",
+    "lowerThreshold": 1,
+    "upperThreshold": 3,
+    "tier": "END"
+  },
+  {
+    "material": "LILAC",
+    "lowerThreshold": 1,
+    "upperThreshold": 3,
+    "tier": "END"
+  },
+  {
+    "material": "ROSE_BUSH",
+    "lowerThreshold": 1,
+    "upperThreshold": 3,
+    "tier": "END"
+  },
+  {
+    "material": "SEA_PICKLE",
+    "lowerThreshold": 1,
+    "upperThreshold": 3,
+    "tier": "END"
+  }
+]
