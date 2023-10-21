@@ -6,10 +6,13 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.EntityEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -194,8 +197,12 @@ public class InventoryListener implements Listener {
                     if (offlinePlayer.isOnline()) {
                         // if online teleport and set gamemode and remove from to spawn list
                         Location location = offlinePlayer.getBedSpawnLocation();
-                        player.teleport(location != null ? location : Bukkit.getWorld(WORLD_NAME).getSpawnLocation());
+                        location = location != null ? location : Bukkit.getWorld(WORLD_NAME).getSpawnLocation();
+                        player.teleport(location);
                         player.setGameMode(GameMode.SURVIVAL);
+                        player.spawnParticle(Particle.TOTEM, location, 100);
+                        player.playEffect(EntityEffect.TOTEM_RESURRECT);
+                        player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 5, 1);
                         playersToSpawn.remove(player.getName());
                     }
                     // if not do nothing
