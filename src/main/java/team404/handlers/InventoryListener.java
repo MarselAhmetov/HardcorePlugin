@@ -1,4 +1,4 @@
-package team404;
+package team404.handlers;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -23,7 +23,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import team404.PlayerRevivalService;
+import team404.utils.TextUtils;
 import team404.constants.ColorHexConstants;
 import team404.models.Recipes;
 
@@ -32,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static team404.PlayerToReviveStore.respawnablePlayers;
-import static team404.PlayerToReviveStore.playersToSpawn;
 import static team404.constants.InventoryConstants.INVENTORY_NAME;
 import static team404.constants.MessagesConstants.*;
 
@@ -41,16 +42,18 @@ public class InventoryListener implements Listener {
     private static final String WORLD_NAME = "world";
     private static final int SECONDS_BEFORE_RESPAWN = 5;
     private static final int INVENTORY_ROW_SIZE = 9;
-    private final HardcorePlugin plugin;
+    private final Plugin plugin;
+    private final PlayerRevivalService playerRevivalService;
 
-    public InventoryListener(HardcorePlugin plugin) {
+    public InventoryListener(Plugin plugin) {
         this.plugin = plugin;
+        this.playerRevivalService = PlayerRevivalService.getInstance(plugin);
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         OfflinePlayer player = event.getPlayer();
-        if (playersToSpawn.contains(player.getName())) {
+        if (playerRevivalService.getPlayersToSpawn().contains(player.getName())) {
             respawnPlayer(player);
         }
     }
@@ -71,7 +74,7 @@ public class InventoryListener implements Listener {
 
     private Inventory getInventory(Player player) {
         Inventory inv = Bukkit.createInventory(null, getInventorySize(), Component.text(INVENTORY_NAME));
-        for (Map.Entry<String, List<Pair<Integer, Material>>> entry : respawnablePlayers.entrySet()) {
+        for (Map.Entry<String, List<Pair<Integer, Material>>> entry : playerRevivalService.getRespawnablePlayers().entrySet()) {
             ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
             skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(entry.getKey()));
@@ -96,11 +99,12 @@ public class InventoryListener implements Listener {
     }
 
     private int getInventorySize() {
-        if (respawnablePlayers.isEmpty()) {
+        var players = playerRevivalService.getRespawnablePlayers();
+        if (players.isEmpty()) {
             return INVENTORY_ROW_SIZE;
         }
-        int rowsCount = respawnablePlayers.size() / INVENTORY_ROW_SIZE;
-        if (respawnablePlayers.size() % INVENTORY_ROW_SIZE != 0) {
+        int rowsCount = players.size() / INVENTORY_ROW_SIZE;
+        if (players.size() % INVENTORY_ROW_SIZE != 0) {
             rowsCount++;
         }
         return rowsCount * INVENTORY_ROW_SIZE;
@@ -150,22 +154,24 @@ public class InventoryListener implements Listener {
 
         OfflinePlayer offlinePlayerToSpawn = ((SkullMeta) clickedItem.getItemMeta()).getOwningPlayer();
         // check that player not revived yet
-        if (!respawnablePlayers.containsKey(offlinePlayerToSpawn.getName())) {
+        var playerToSpawnName = offlinePlayerToSpawn.getName();
+        if (!playerRevivalService.getRespawnablePlayers().containsKey(playerToSpawnName)) {
             player.sendMessage(PLAYER_ALREADY_REVIVED);
             return;
         }
         // check that player who clicked has enough materials
-        List<Pair<Integer, Material>> materials = respawnablePlayers.get(offlinePlayerToSpawn.getName());
+        List<Pair<Integer, Material>> materials = playerRevivalService.getRespawnablePlayers().get(playerToSpawnName);
         if (!checkMaterialInInventory(player, materials)) {
             player.sendMessage(Component.text(NOT_ENOUGH_RESOURCES)
                     .color(TextColor.fromHexString(ColorHexConstants.RED_HEX)));
             return;
         }
         // add player to spawn map
-        respawnablePlayers.remove(offlinePlayerToSpawn.getName());
-        playersToSpawn.add(offlinePlayerToSpawn.getName());
+        playerRevivalService.addPlayerToRespawn(playerToSpawnName);
+        playerRevivalService.removeRespawnablePlayer(playerToSpawnName);
+
         player.sendMessage(
-                Component.text(PLAYER_REVIVED.formatted(offlinePlayerToSpawn.getName()))
+                Component.text(PLAYER_REVIVED.formatted(playerToSpawnName))
                         .color(TextColor.fromHexString(ColorHexConstants.GREEN_HEX))
         );
         player.closeInventory();
@@ -203,7 +209,7 @@ public class InventoryListener implements Listener {
                         player.spawnParticle(Particle.TOTEM, location, 100);
                         player.playEffect(EntityEffect.TOTEM_RESURRECT);
                         player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 5, 1);
-                        playersToSpawn.remove(player.getName());
+                        playerRevivalService.removePlayerToRespawn(player.getName());
                     }
                     // if not do nothing
                     cancel();

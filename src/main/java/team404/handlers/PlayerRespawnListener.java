@@ -1,4 +1,4 @@
-package team404;
+package team404.handlers;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
@@ -8,19 +8,27 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.plugin.Plugin;
+import team404.MaterialGenerator;
+import team404.PlayerRevivalService;
 import team404.models.MaterialTier;
 
 import java.util.List;
 import java.util.Optional;
 
-import static team404.PlayerToReviveStore.respawnablePlayers;
-
 public class PlayerRespawnListener implements Listener {
+
+    private final PlayerRevivalService playerRevivalService;
+
+    public PlayerRespawnListener(Plugin plugin) {
+        this.playerRevivalService = PlayerRevivalService.getInstance(plugin);
+    }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        respawnablePlayers.put(player.getName(), loadRequiredMaterials(getMaterialTier(player)));
+        var materials = loadRequiredMaterials(getMaterialTier(player));
+        playerRevivalService.addRespawnablePlayer(player.getName(), materials);
     }
 
     private MaterialTier getMaterialTier(Player player) {
