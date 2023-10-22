@@ -13,6 +13,7 @@ public class PlayerRevivalService {
     private static PlayerRevivalService instance;
     private final PlayerRevivalCache cache;
     private final PlayerRevivalFileManager fileRepository;
+
     private PlayerRevivalService(Plugin plugin) {
         cache = PlayerRevivalCache.getInstance();
         fileRepository = PlayerRevivalFileManager.getInstance(plugin);
