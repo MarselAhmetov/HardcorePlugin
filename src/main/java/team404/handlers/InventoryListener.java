@@ -24,7 +24,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import team404.PlayerRevivalService;
 import team404.utils.TextUtils;
@@ -210,7 +209,7 @@ public class InventoryListener implements Listener {
                         player.spawnParticle(Particle.TOTEM, location, 100);
                         player.playEffect(EntityEffect.TOTEM_RESURRECT);
                         player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 5, 1);
-                        player.removePotionEffect(PotionEffectType.BLINDNESS);
+                        player.clearActivePotionEffects();
                         playerRevivalService.removePlayerToRespawn(player.getName());
                     }
                     // if not do nothing

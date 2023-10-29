@@ -20,6 +20,8 @@ import team404.models.MaterialTier;
 import java.util.List;
 import java.util.Optional;
 
+import static org.bukkit.potion.PotionEffect.INFINITE_DURATION;
+
 public class PlayerRespawnListener implements Listener {
 
     private final PlayerRevivalService playerRevivalService;
@@ -41,7 +43,7 @@ public class PlayerRespawnListener implements Listener {
     public void onPlayerModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
         if (event.getNewGameMode().equals(GameMode.SPECTATOR) && playerRevivalService.getRespawnablePlayers().containsKey(player.getName())) {
-            PotionEffect blindnessEffect = new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0, true, false);
+            PotionEffect blindnessEffect = new PotionEffect(PotionEffectType.BLINDNESS, INFINITE_DURATION, 0, true, false);
             player.addPotionEffect(blindnessEffect);
         }
     }
