@@ -2,19 +2,25 @@ package team404.handlers;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import team404.MaterialGenerator;
 import team404.PlayerRevivalService;
 import team404.models.MaterialTier;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.bukkit.potion.PotionEffect.INFINITE_DURATION;
 
 public class PlayerRespawnListener implements Listener {
 
@@ -27,8 +33,19 @@ public class PlayerRespawnListener implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        var materials = loadRequiredMaterials(getMaterialTier(player));
-        playerRevivalService.addRespawnablePlayer(player.getName(), materials);
+        if (!playerRevivalService.getRespawnablePlayers().containsKey(player.getName())) {
+            var materials = loadRequiredMaterials(getMaterialTier(player));
+            playerRevivalService.addRespawnablePlayer(player.getName(), materials);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerModeChange(PlayerGameModeChangeEvent event) {
+        Player player = event.getPlayer();
+        if (event.getNewGameMode().equals(GameMode.SPECTATOR) && playerRevivalService.getRespawnablePlayers().containsKey(player.getName())) {
+            PotionEffect blindnessEffect = new PotionEffect(PotionEffectType.BLINDNESS, INFINITE_DURATION, 0, true, false);
+            player.addPotionEffect(blindnessEffect);
+        }
     }
 
     private MaterialTier getMaterialTier(Player player) {

@@ -209,6 +209,7 @@ public class InventoryListener implements Listener {
                         player.spawnParticle(Particle.TOTEM, location, 100);
                         player.playEffect(EntityEffect.TOTEM_RESURRECT);
                         player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 5, 1);
+                        player.clearActivePotionEffects();
                         playerRevivalService.removePlayerToRespawn(player.getName());
                     }
                     // if not do nothing
