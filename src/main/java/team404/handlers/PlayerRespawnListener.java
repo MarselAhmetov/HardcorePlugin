@@ -31,8 +31,8 @@ public class PlayerRespawnListener implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        var materials = loadRequiredMaterials(getMaterialTier(player));
         if (!playerRevivalService.getRespawnablePlayers().containsKey(player.getName())) {
+            var materials = loadRequiredMaterials(getMaterialTier(player));
             playerRevivalService.addRespawnablePlayer(player.getName(), materials);
         }
     }
