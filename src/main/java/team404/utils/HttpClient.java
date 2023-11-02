@@ -32,6 +32,7 @@ public class HttpClient {
 
             connection.disconnect();
         } catch (Exception e) {
+            e.printStackTrace();
             Bukkit.getLogger().warning("Request was not send");
         }
     }
