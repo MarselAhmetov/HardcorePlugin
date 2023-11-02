@@ -15,18 +15,24 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import team404.MaterialGenerator;
 import team404.PlayerRevivalService;
+import team404.PlayerReviveRequest;
 import team404.models.MaterialTier;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.bukkit.potion.PotionEffect.INFINITE_DURATION;
+import static team404.utils.HttpClient.sendPostRequest;
 
 public class PlayerRespawnListener implements Listener {
 
     private final PlayerRevivalService playerRevivalService;
 
+    private final Plugin plugin;
+
     public PlayerRespawnListener(Plugin plugin) {
+        this.plugin = plugin;
         this.playerRevivalService = PlayerRevivalService.getInstance(plugin);
     }
 
@@ -36,6 +42,10 @@ public class PlayerRespawnListener implements Listener {
         if (!playerRevivalService.getRespawnablePlayers().containsKey(player.getName())) {
             var materials = loadRequiredMaterials(getMaterialTier(player));
             playerRevivalService.addRespawnablePlayer(player.getName(), materials);
+            sendPostRequest(plugin.getConfig().getString("bot-address"),
+                    new PlayerReviveRequest(player.getName(), materials.stream()
+                            .collect(Collectors.toMap(pair -> pair.getValue().name(), Pair::getKey))
+                    ));
         }
     }
 
