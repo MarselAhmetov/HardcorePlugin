@@ -26,6 +26,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import team404.PlayerRevivalService;
+import team404.models.requests.PlayerRevivedRequest;
 import team404.utils.TextUtils;
 import team404.constants.ColorHexConstants;
 import team404.models.Recipes;
@@ -36,7 +37,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static team404.constants.InventoryConstants.INVENTORY_NAME;
-import static team404.constants.MessagesConstants.*;
+import static team404.constants.MessagesConstants.NOT_ENOUGH_RESOURCES;
+import static team404.constants.MessagesConstants.PLAYER_ALREADY_REVIVED;
+import static team404.constants.MessagesConstants.PLAYER_REVIVED;
+import static team404.constants.MessagesConstants.YOU_WILL_BE_REVIVED_IN;
+import static team404.constants.TelegramBotConstants.PLAYER_REVIVED_PATH;
+import static team404.utils.HttpClient.sendPostRequest;
 
 public class InventoryListener implements Listener {
     private static final String WORLD_NAME = "world";
@@ -211,6 +217,10 @@ public class InventoryListener implements Listener {
                         player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 5, 1);
                         player.clearActivePotionEffects();
                         playerRevivalService.removePlayerToRespawn(player.getName());
+                        sendPostRequest(
+                                plugin.getConfig().getString("bot-address") + PLAYER_REVIVED_PATH,
+                                new PlayerRevivedRequest(player.getName())
+                        );
                     }
                     // if not do nothing
                     cancel();

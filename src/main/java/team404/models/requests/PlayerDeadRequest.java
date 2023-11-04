@@ -1,4 +1,4 @@
-package team404;
+package team404.models.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -8,7 +8,7 @@ import java.util.Map;
 
 @JsonSerialize
 @AllArgsConstructor
-public class PlayerReviveRequest {
+public class PlayerDeadRequest {
     @JsonProperty
     private String name;
     @JsonProperty

@@ -15,7 +15,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import team404.MaterialGenerator;
 import team404.PlayerRevivalService;
-import team404.PlayerReviveRequest;
+import team404.models.requests.PlayerDeadRequest;
 import team404.models.MaterialTier;
 
 import java.util.List;
@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.bukkit.potion.PotionEffect.INFINITE_DURATION;
+import static team404.constants.TelegramBotConstants.PLAYER_DEAD_PATH;
 import static team404.utils.HttpClient.sendPostRequest;
 
 public class PlayerRespawnListener implements Listener {
@@ -42,8 +43,8 @@ public class PlayerRespawnListener implements Listener {
         if (!playerRevivalService.getRespawnablePlayers().containsKey(player.getName())) {
             var materials = loadRequiredMaterials(getMaterialTier(player));
             playerRevivalService.addRespawnablePlayer(player.getName(), materials);
-            sendPostRequest(plugin.getConfig().getString("bot-address"),
-                    new PlayerReviveRequest(player.getName(), materials.stream()
+            sendPostRequest(plugin.getConfig().getString("bot-address") + PLAYER_DEAD_PATH,
+                    new PlayerDeadRequest(player.getName(), materials.stream()
                             .collect(Collectors.toMap(pair -> pair.getValue().name(), Pair::getKey))
                     ));
         }
