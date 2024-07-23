@@ -39,6 +39,7 @@ public class PlayerRevivalFileManager {
 
     public Map<String, List<Pair<Integer, Material>>> readRespawnablePlayers() {
         return readAllLines(respawnablePlayersFile).stream()
+                .filter(it -> it != null && !it.isEmpty())
                 .map(this::processRespawnablePlayer)
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
     }
