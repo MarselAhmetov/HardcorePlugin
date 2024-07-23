@@ -208,11 +208,11 @@ public class InventoryListener implements Listener {
                     // check that player is online
                     if (offlinePlayer.isOnline()) {
                         // if online teleport and set gamemode and remove from to spawn list
-                        Location location = offlinePlayer.getBedSpawnLocation();
+                        Location location = offlinePlayer.getRespawnLocation();
                         location = location != null ? location : Bukkit.getWorld(WORLD_NAME).getSpawnLocation();
                         player.teleport(location);
                         player.setGameMode(GameMode.SURVIVAL);
-                        player.spawnParticle(Particle.TOTEM, location, 100);
+                        player.spawnParticle(Particle.TOTEM_OF_UNDYING, location, 100);
                         player.playEffect(EntityEffect.TOTEM_RESURRECT);
                         player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 5, 1);
                         player.clearActivePotionEffects();

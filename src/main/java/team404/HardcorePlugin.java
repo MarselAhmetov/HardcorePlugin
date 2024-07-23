@@ -23,7 +23,7 @@ public final class HardcorePlugin extends JavaPlugin {
         createConfigFiles();
         playerRevivalService.loadData();
         MaterialLoader.loadMaterials(this.getDataFolder());
-        Bukkit.getLogger().info("Hardcore plugin enabled");
+        getLogger().info("Hardcore plugin enabled");
     }
 
     private void createConfigFiles() {
