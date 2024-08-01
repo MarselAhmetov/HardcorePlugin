@@ -1,11 +1,14 @@
 name: hardcore-plugin
-version: '${project.version}'
+version: '0.0.2'
 main: team404.HardcorePlugin
-api-version: '1.20'
+api-version: '1.21'
 commands:
   dev:
     description: Get all items to revive players
     usage: /<command>
   stick:
     description: Get stick for reviving players
+    usage: /<command>
+  buyback:
+    description: Buyback for reviving yourself
     usage: /<command>
