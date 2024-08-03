@@ -10,21 +10,24 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerGameModeChangeEvent
 import org.bukkit.event.player.PlayerRespawnEvent
-import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.slf4j.LoggerFactory
-import team404.constant.*
+import team404.constant.BUYBACK_TIMER_KEY
+import team404.constant.PLAYER_DEAD_PATH
+import team404.constant.PLUGIN_NAMESPACE
+import team404.model.MaterialTier
+import team404.model.request.PlayerDeadRequest
 import team404.service.MaterialGenerator
 import team404.service.NamespaceKeyManager
 import team404.service.PlayerRevivalService
-import team404.model.MaterialTier
-import team404.model.request.PlayerDeadRequest
 import team404.util.HttpClient.sendPostRequest
-import team404.util.getData
-import team404.util.removeData
-import team404.util.setData
+import team404.util.getBuybackCount
+import team404.util.getRespawnMaterialsMultiplier
+import team404.util.removeBuybackTimeLeft
+import team404.util.removeRespawnMaterialsMultiplier
+import team404.util.setRespawnMaterialsMultiplier
 
 class PlayerRespawnListener(private val plugin: Plugin) : Listener {
 
@@ -35,27 +38,23 @@ class PlayerRespawnListener(private val plugin: Plugin) : Listener {
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent) {
         val player = event.entity
-        val bossBar = Bukkit.getBossBar(NamespaceKeyManager.getKey(plugin, "${player.name}$BUYBACK_TIMER_KEY"))
+        val bossBar = Bukkit.getBossBar(NamespaceKeyManager.getKey(PLUGIN_NAMESPACE, "${player.name.lowercase()}$BUYBACK_TIMER_KEY"))
         bossBar?.let {
             it.removeAll()
             Bukkit.removeBossBar(it.key)
         }
-        val buybackCount = player.getData(NamespaceKeyManager.getKey(plugin, BUYBACK_COUNT_KEY), PersistentDataType.INTEGER) ?: 0
+        val buybackCount = player.getBuybackCount() ?: 0
         if (buybackCount > 0) {
-            player.setData(
-                NamespaceKeyManager.getKey(plugin, RESPAWN_MATERIALS_MULTIPLIER_KEY),
-                PersistentDataType.INTEGER,
-                2
-            )
+            player.setRespawnMaterialsMultiplier(2)
         }
-        player.removeData(NamespaceKeyManager.getKey(plugin, BUYBACK_TIME_LEFT_KEY))
+        player.removeBuybackTimeLeft()
     }
 
     @EventHandler
     fun onPlayerRespawn(event: PlayerRespawnEvent) {
         val player = event.player
-        val multiplier = player.getData(NamespaceKeyManager.getKey(plugin, RESPAWN_MATERIALS_MULTIPLIER_KEY), PersistentDataType.INTEGER) ?: 1
-        player.removeData(NamespaceKeyManager.getKey(plugin, RESPAWN_MATERIALS_MULTIPLIER_KEY))
+        val multiplier = player.getRespawnMaterialsMultiplier() ?: 1
+        player.removeRespawnMaterialsMultiplier()
         val materials = getMaterialsToRevive(getMaterialTier(player), multiplier)
         playerRevivalService.run {
             if (respawnablePlayers.containsKey(player.name)) {

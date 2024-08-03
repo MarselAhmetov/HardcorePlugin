@@ -5,9 +5,16 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
-import org.bukkit.plugin.Plugin
+import team404.constant.PLUGIN_NAMESPACE
+import team404.constant.REVIVE_STICK_ENCHANTMENT
+import team404.constant.REVIVE_STICK_ENCHANTMENT_LEVEL
+import team404.constant.REVIVE_STICK_LORE
+import team404.constant.REVIVE_STICK_MATERIAL
+import team404.constant.REVIVE_STICK_NAME
+import team404.constant.REVIVE_STICK_RECIPE_KEY
+import team404.constant.REVIVE_STICK_RECIPE_MATERIALS
+import team404.constant.REVIVE_STICK_SHAPE
 import team404.service.NamespaceKeyManager
-import team404.constant.*
 
 object Recipes {
 
@@ -19,8 +26,8 @@ object Recipes {
             this.itemMeta.displayName(Component.text(REVIVE_STICK_NAME))
         }
 
-    fun getReviveStuffRecipe(plugin: Plugin): Recipe {
-        val recipe = ShapedRecipe(NamespaceKeyManager.getKey(plugin, REVIVE_STICK_RECIPE_KEY), getReviveStuffItemStack())
+    fun getReviveStuffRecipe(): Recipe {
+        val recipe = ShapedRecipe(NamespaceKeyManager.getKey(PLUGIN_NAMESPACE, REVIVE_STICK_RECIPE_KEY), getReviveStuffItemStack())
         recipe.shape(*REVIVE_STICK_SHAPE)
         for ((key, value) in REVIVE_STICK_RECIPE_MATERIALS) {
             recipe.setIngredient(key, value)

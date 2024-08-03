@@ -41,7 +41,7 @@ class HardcorePlugin : JavaPlugin() {
     }
 
     private fun registerRecipes() {
-        Bukkit.addRecipe(Recipes.getReviveStuffRecipe(this))
+        Bukkit.addRecipe(Recipes.getReviveStuffRecipe())
     }
 
     private fun registerCommands() {
