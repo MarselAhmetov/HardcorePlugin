@@ -14,14 +14,14 @@ import org.bukkit.inventory.meta.SkullMeta
 import org.bukkit.plugin.Plugin
 import org.jetbrains.annotations.NotNull
 import team404.constant.BUYBACK_INVENTORY_NAME
-import team404.constant.BUYBACK_TIMER_KEY
 import team404.constant.INVENTORY_ROW_SIZE
-import team404.constant.PLUGIN_NAMESPACE
-import team404.service.NamespaceKeyManager
 import team404.service.PlayerRevivalService
 import team404.util.TextUtils.formatTime
 import team404.util.getBuybackTimeLeft
+import team404.util.getBuybackTimerBar
+import team404.util.getOrCreateBuybackTimerBar
 import team404.util.removeBuybackTimeLeft
+import team404.util.removeBuybackTimerBar
 import team404.util.setBuybackTimeLeft
 import java.util.logging.Logger
 
@@ -73,33 +73,42 @@ class BuybackCommandExecutor(private val plugin: Plugin) : CommandExecutor {
 
     private fun startTimerTask() {
         Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
-            Bukkit.getOnlinePlayers().forEach { player ->
-                val timeLeft = player.getBuybackTimeLeft()
+            checkBuybackTimers()
+        }, 0L, 20L)
+    }
 
-                timeLeft?.let {
-                    val bossBar = Bukkit.getBossBar(NamespaceKeyManager.getKey(PLUGIN_NAMESPACE, "${player.name.lowercase()}$BUYBACK_TIMER_KEY"))
-                    val timeLeftUpdated = it - 20 // уменьшаем на 1 секунду (20 тиков)
+    private fun checkBuybackTimers() {
+        Bukkit.getOnlinePlayers().forEach { player ->
+            checkBuybackTimer(player)
+        }
+    }
 
-                    if (timeLeftUpdated <= 0) {
+    private fun checkBuybackTimer(player: Player) {
+        player.getBuybackTimeLeft()
+            ?.let { it - 20 }
+            ?.also { timeLeftUpdated ->
+                if (timeLeftUpdated <= 0) {
+                    player.damage(1000.0)
+                    if (playerRevivalService.isRespawnablePlayer(player.name)) {
                         player.sendMessage("Ваш таймер истек.")
-                        bossBar?.removeAll()
-                        Bukkit.removeBossBar(NamespaceKeyManager.getKey(PLUGIN_NAMESPACE, "${player.name.lowercase()}$BUYBACK_TIMER_KEY"))
+                        playerRevivalService.removeRespawnablePlayer(player.name)
+                    }
+                    if (player.health < 0) {
+                        player.getBuybackTimerBar()?.also {
+                            it.removeAll()
+                        }
+                        player.removeBuybackTimerBar()
                         player.removeBuybackTimeLeft()
-                        if (playerRevivalService.isRespawnablePlayer(player.name)) {
-                            playerRevivalService.removeRespawnablePlayer(player.name)
-                            player.damage(100.0)
-                        }
+                    }
+                } else {
+                    player.setBuybackTimeLeft(timeLeftUpdated)
+                    player.getOrCreateBuybackTimerBar().apply {
+                        addPlayer(player)
+                        progress = timeLeftUpdated.toDouble() / buybackTime
+                        setTitle("Оставшееся время: ${formatTime(timeLeftUpdated)}")
 
-                    } else {
-                        player.setBuybackTimeLeft(timeLeftUpdated)
-                        bossBar?.apply {
-                            progress = timeLeftUpdated.toDouble() / buybackTime
-                            setTitle("Оставшееся время: ${formatTime(timeLeftUpdated)}")
-                        }
                     }
                 }
-
             }
-        }, 0L, 20L)
     }
 }

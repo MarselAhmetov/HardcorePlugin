@@ -1,14 +1,15 @@
-package team404.util
+package team404.client
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
+import team404.constant.PLUGIN_NAMESPACE
 import java.net.HttpURLConnection
 import java.net.URI
 import java.nio.charset.StandardCharsets
 
 object HttpClient {
     private val objectMapper = ObjectMapper()
-    private val logger = LoggerFactory.getLogger(HttpClient::class.java)
+    private val logger = LoggerFactory.getLogger(PLUGIN_NAMESPACE)
 
     fun sendPostRequest(urlString: String, request: Any) {
         try {

@@ -9,21 +9,19 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerGameModeChangeEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.plugin.Plugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.slf4j.LoggerFactory
-import team404.constant.BUYBACK_TIMER_KEY
-import team404.constant.PLAYER_DEAD_PATH
+import team404.client.TelegramDemoBotClient.sendPlayerDeadRequest
 import team404.constant.PLUGIN_NAMESPACE
 import team404.model.MaterialTier
-import team404.model.request.PlayerDeadRequest
 import team404.service.MaterialGenerator
-import team404.service.NamespaceKeyManager
 import team404.service.PlayerRevivalService
-import team404.util.HttpClient.sendPostRequest
 import team404.util.getBuybackCount
+import team404.util.getBuybackTimerBar
 import team404.util.getRespawnMaterialsMultiplier
 import team404.util.removeBuybackTimeLeft
 import team404.util.removeRespawnMaterialsMultiplier
@@ -33,12 +31,27 @@ class PlayerRespawnListener(private val plugin: Plugin) : Listener {
 
     private val playerRevivalService: PlayerRevivalService = PlayerRevivalService.getInstance(plugin)
 
-    private val logger = LoggerFactory.getLogger(PlayerRespawnListener::class.java)
+    private val logger = LoggerFactory.getLogger(PLUGIN_NAMESPACE)
+
+    @EventHandler
+    fun onPlayerJoin(event: PlayerJoinEvent) {
+        Bukkit.getPluginManager().getPlugin(PLUGIN_NAMESPACE)
+        event.player
+            .takeIf { playerRevivalService.playersToSpawn.contains(it.name) }
+            ?.also {
+                val buybackCount = it.getBuybackCount() ?: 0
+                if (buybackCount > 0) {
+                    playerRevivalService.buybackPlayer(it)
+                } else {
+                    playerRevivalService.respawnPlayer(it)
+                }
+            }
+    }
 
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent) {
         val player = event.entity
-        val bossBar = Bukkit.getBossBar(NamespaceKeyManager.getKey(PLUGIN_NAMESPACE, "${player.name.lowercase()}$BUYBACK_TIMER_KEY"))
+        val bossBar = player.getBuybackTimerBar()
         bossBar?.let {
             it.removeAll()
             Bukkit.removeBossBar(it.key)
@@ -62,9 +75,7 @@ class PlayerRespawnListener(private val plugin: Plugin) : Listener {
             }
             addRespawnablePlayer(player.name, materials)
         }
-        sendPostRequest("${plugin.config.getString("bot-address")}$PLAYER_DEAD_PATH",
-            PlayerDeadRequest(player.name, materials.mapKeys { it.key.name })
-        )
+        sendPlayerDeadRequest(player.name, materials)
     }
 
     @EventHandler

@@ -4,6 +4,8 @@ import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 // Common
 const val PLUGIN_NAMESPACE: String = "hardcore-plugin"
+const val WORLD_NAME = "world"
+const val SECONDS_BEFORE_RESPAWN = 5
 
 // TelegramBotConstants
 const val PLAYER_DEAD_PATH: String = "/api/player/dead"

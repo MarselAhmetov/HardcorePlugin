@@ -1,6 +1,7 @@
 package team404.util
 
 import org.slf4j.LoggerFactory
+import team404.constant.PLUGIN_NAMESPACE
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -11,7 +12,7 @@ import java.util.*
 
 object FileUtils {
 
-    private val logger = LoggerFactory.getLogger(FileUtils::class.java)
+    private val logger = LoggerFactory.getLogger(PLUGIN_NAMESPACE)
 
     @JvmStatic
     fun readAllLines(file: File): List<String> {

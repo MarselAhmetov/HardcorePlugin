@@ -13,17 +13,26 @@ import team404.listener.command.StickCommandExecutor.Companion.GET_STICK_COMMAND
 import team404.model.Recipes
 import team404.service.MaterialLoader
 import team404.service.PlayerRevivalService
+import java.io.File
+
+var botAddress: String? = null
+var pluginDataFolder: File? = null
+var buybackTime: Long = 72000
+
 
 class HardcorePlugin : JavaPlugin() {
     private val playerRevivalService = PlayerRevivalService.getInstance(this)
 
     override fun onEnable() {
+        botAddress = config.getString("bot-address")
+        pluginDataFolder = this.dataFolder
+        buybackTime = config.getLong("buyback-time")
         registerEvents()
         registerRecipes()
         registerCommands()
         createConfigFiles()
         playerRevivalService.loadData()
-        MaterialLoader.loadMaterials(this.dataFolder)
+        MaterialLoader.loadMaterials()
         logger.info("Hardcore plugin enabled")
     }
 

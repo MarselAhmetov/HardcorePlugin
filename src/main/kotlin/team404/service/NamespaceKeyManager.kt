@@ -2,7 +2,6 @@ package team404.service
 
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.Plugin
-import java.util.*
 
 object NamespaceKeyManager {
     private val keys: MutableMap<String, NamespacedKey> = HashMap()

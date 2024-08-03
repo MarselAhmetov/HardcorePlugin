@@ -3,10 +3,10 @@ package team404.service
 import org.apache.commons.lang3.tuple.Pair
 import org.bukkit.Material
 import org.bukkit.plugin.Plugin
+import team404.util.FileUtils.appendToFile
 import team404.util.FileUtils.createFile
 import team404.util.FileUtils.readAllLines
 import team404.util.FileUtils.writeToFile
-import team404.util.FileUtils.appendToFile
 import java.io.File
 
 class PlayerRevivalFileManager private constructor(plugin: Plugin) {
