@@ -1,2 +1,2 @@
-bot-address: "http://localhost:8050"
+bot-address:
 buyback-time: 72000

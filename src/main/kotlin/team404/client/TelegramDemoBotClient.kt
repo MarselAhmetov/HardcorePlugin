@@ -10,15 +10,19 @@ import team404.model.request.PlayerRevivedRequest
 
 object TelegramDemoBotClient {
     fun sendPlayerRevivedRequest(name: String) {
-        sendPostRequest(
-            "${botAddress}$PLAYER_REVIVED_PATH",
-            PlayerRevivedRequest(name)
-        )
+        botAddress?.let {
+            sendPostRequest(
+                "${it}$PLAYER_REVIVED_PATH",
+                PlayerRevivedRequest(name)
+            )
+        }
     }
 
     fun sendPlayerDeadRequest(name: String, materials: Map<Material, Int>) {
-        sendPostRequest("${botAddress}$PLAYER_DEAD_PATH",
-            PlayerDeadRequest(name, materials.mapKeys { it.key.name })
-        )
+        botAddress?.let {
+            sendPostRequest("${it}$PLAYER_DEAD_PATH",
+                PlayerDeadRequest(name, materials.mapKeys { it.key.name })
+            )
+        }
     }
 }
