@@ -25,6 +25,7 @@ import team404.util.getBuybackTimerBar
 import team404.util.getRespawnMaterialsMultiplier
 import team404.util.removeBuybackTimeLeft
 import team404.util.removeRespawnMaterialsMultiplier
+import team404.util.setIsInBuyback
 import team404.util.setRespawnMaterialsMultiplier
 
 class PlayerRespawnListener(private val plugin: Plugin) : Listener {
@@ -60,6 +61,8 @@ class PlayerRespawnListener(private val plugin: Plugin) : Listener {
         if (buybackCount > 0) {
             player.setRespawnMaterialsMultiplier(2)
         }
+        playerRevivalService.removeRespawnablePlayer(player.name)
+        player.setIsInBuyback(false)
         player.removeBuybackTimeLeft()
     }
 

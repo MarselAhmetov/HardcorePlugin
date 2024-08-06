@@ -19,8 +19,10 @@ import team404.constant.WORLD_NAME
 import team404.constant.YOU_WILL_BE_REVIVED_IN
 import team404.util.getBuybackCount
 import team404.util.getOrCreateBuybackTimerBar
+import team404.util.removeBuybackCount
 import team404.util.setBuybackCount
 import team404.util.setBuybackTimeLeft
+import team404.util.setIsInBuyback
 import java.util.concurrent.atomic.AtomicInteger
 
 class PlayerRevivalService private constructor(private val plugin: Plugin) {
@@ -93,6 +95,7 @@ class PlayerRevivalService private constructor(private val plugin: Plugin) {
                         player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f)
                         player.clearActivePotionEffects()
                         removePlayerToRespawn(player.name)
+                        player.setIsInBuyback(true)
                         player.setBuybackTimeLeft(buybackTime)
                         player.getOrCreateBuybackTimerBar().also {
                             it.addPlayer(player)
@@ -123,6 +126,7 @@ class PlayerRevivalService private constructor(private val plugin: Plugin) {
                     if (offlinePlayer.isOnline) {
                         val location = player.respawnLocation ?: Bukkit.getWorld(WORLD_NAME)?.spawnLocation ?: return
                         player.apply {
+                            this.removeBuybackCount()
                             this.teleport(location)
                             this.gameMode = GameMode.SURVIVAL
                             this.spawnParticle(Particle.TOTEM_OF_UNDYING, location, 100)

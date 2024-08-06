@@ -23,6 +23,7 @@ import team404.util.getOrCreateBuybackTimerBar
 import team404.util.removeBuybackTimeLeft
 import team404.util.removeBuybackTimerBar
 import team404.util.setBuybackTimeLeft
+import team404.util.setIsInBuyback
 import java.util.logging.Logger
 
 class BuybackCommandExecutor(private val plugin: Plugin) : CommandExecutor {
@@ -97,6 +98,7 @@ class BuybackCommandExecutor(private val plugin: Plugin) : CommandExecutor {
                         player.getBuybackTimerBar()?.also {
                             it.removeAll()
                         }
+                        player.setIsInBuyback(false)
                         player.removeBuybackTimerBar()
                         player.removeBuybackTimeLeft()
                     }

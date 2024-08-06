@@ -37,9 +37,11 @@ import team404.util.TextUtils.formatTime
 import team404.util.getBuybackCount
 import team404.util.getBuybackTimeLeft
 import team404.util.getBuybackTimerBar
+import team404.util.isInBuyback
 import team404.util.removeBuybackCount
 import team404.util.removeBuybackTimeLeft
 import team404.util.removeItems
+import team404.util.setIsInBuyback
 
 
 class InventoryListener(plugin: Plugin) : Listener {
@@ -118,7 +120,7 @@ class InventoryListener(plugin: Plugin) : Listener {
 
     @EventHandler
     fun onInventoryClick(event: InventoryClickEvent) {
-        val player = event.whoClicked as? Player ?: return
+        val reviver = event.whoClicked as? Player ?: return
         when (PlainTextComponentSerializer.plainText().serialize(event.view.title())) {
             REVIVE_INVENTORY_NAME -> {
                 val clickedItem = event.currentItem ?: return
@@ -128,41 +130,40 @@ class InventoryListener(plugin: Plugin) : Listener {
                 }
                 val offlinePlayerToSpawn = (clickedItem.itemMeta as SkullMeta).owningPlayer ?: return
 
-                val isPlayerBoughtback = offlinePlayerToSpawn.player?.getBuybackTimeLeft() != null
-
-                if (player.uniqueId != offlinePlayerToSpawn.uniqueId && isPlayerBoughtback) {
-                    player.sendMessage(PLAYER_BOUGHT_BACK)
+                val isPlayerBoughtback = offlinePlayerToSpawn.isInBuyback()
+                if (reviver.uniqueId != offlinePlayerToSpawn.uniqueId && isPlayerBoughtback) {
+                    reviver.sendMessage(PLAYER_BOUGHT_BACK)
                     return
                 }
 
                 val playerToSpawnName = offlinePlayerToSpawn.name ?: return
-                if (!playerRevivalService.respawnablePlayers.containsKey(playerToSpawnName)) {
-                    player.sendMessage(PLAYER_ALREADY_REVIVED)
+                if (!playerRevivalService.respawnablePlayers.containsKey(playerToSpawnName) || playerRevivalService.playersToSpawn.contains(playerToSpawnName)) {
+                    reviver.sendMessage(PLAYER_ALREADY_REVIVED)
                     return
                 }
 
                 val materials = playerRevivalService.respawnablePlayers[playerToSpawnName] ?: return
-                if (!checkMaterialInInventory(player, materials)) {
-                    player.sendMessage(Component.text(NOT_ENOUGH_RESOURCES).color(TextColor.fromHexString(RED_HEX)))
+                if (!checkMaterialInInventory(reviver, materials)) {
+                    reviver.sendMessage(Component.text(NOT_ENOUGH_RESOURCES).color(TextColor.fromHexString(RED_HEX)))
                     return
                 }
 
                 playerRevivalService.removeRespawnablePlayer(playerToSpawnName)
 
-                player.closeInventory()
-                removeItems(player, materials)
+                reviver.closeInventory()
+                removeItems(reviver, materials)
 
-                player.removeBuybackCount()
-                player.removeBuybackTimeLeft()
-
-                if (isPlayerBoughtback && player.uniqueId == offlinePlayerToSpawn.uniqueId) {
-                    player.getBuybackTimerBar()?.apply {
+                if (isPlayerBoughtback && reviver.uniqueId == offlinePlayerToSpawn.uniqueId) {
+                    reviver.setIsInBuyback(false)
+                    reviver.removeBuybackCount()
+                    reviver.removeBuybackTimeLeft()
+                    reviver.getBuybackTimerBar()?.apply {
                             this.removeAll()
                             Bukkit.removeBossBar(this.key)
                         }
-                    player.sendMessage(Component.text(YOU_ARE_FREE).color(TextColor.fromHexString(GOLDEN_HEX)))
+                    reviver.sendMessage(Component.text(YOU_ARE_FREE).color(TextColor.fromHexString(GOLDEN_HEX)))
                 } else {
-                    player.sendMessage(
+                    reviver.sendMessage(
                         Component.text(PLAYER_REVIVED.format(playerToSpawnName))
                             .color(TextColor.fromHexString(GREEN_HEX))
                     )
@@ -178,25 +179,25 @@ class InventoryListener(plugin: Plugin) : Listener {
                     return
                 }
 
-                val buybackCount = player.getBuybackCount()
+                val buybackCount = reviver.getBuybackCount()
                 if (buybackCount != null && buybackCount >= MAX_BUYBACK_COUNT) {
-                    player.sendMessage(CANT_BUYBACK)
+                    reviver.sendMessage(CANT_BUYBACK)
                     return
                 }
 
-                val playerToSpawnName = player.name
+                val playerToSpawnName = reviver.name
                 if (!playerRevivalService.respawnablePlayers.containsKey(playerToSpawnName)) {
-                    player.sendMessage(PLAYER_ALREADY_REVIVED)
+                    reviver.sendMessage(PLAYER_ALREADY_REVIVED)
                     return
                 }
 
                 playerRevivalService.addPlayerToRespawn(playerToSpawnName)
-                player.sendMessage(
+                reviver.sendMessage(
                     Component.text(PLAYER_REVIVED.format(playerToSpawnName))
                         .color(TextColor.fromHexString(GREEN_HEX))
                 )
-                player.closeInventory()
-                playerRevivalService.buybackPlayer(player)
+                reviver.closeInventory()
+                playerRevivalService.buybackPlayer(reviver)
             }
         }
     }

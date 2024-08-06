@@ -1,6 +1,7 @@
 package team404.util
 
 import org.bukkit.Bukkit
+import org.bukkit.OfflinePlayer
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
 import org.bukkit.boss.KeyedBossBar
@@ -11,6 +12,7 @@ import team404.constant.BUYBACK_TIMER_KEY
 import team404.constant.BUYBACK_TIME_LEFT_KEY
 import team404.constant.PLUGIN_NAMESPACE
 import team404.constant.RESPAWN_MATERIALS_MULTIPLIER_KEY
+import team404.constant.WORLD_NAME
 import team404.service.NamespaceKeyManager
 
 fun Player.setBuybackTimeLeft(buybackTimeLeft: Long) {
@@ -84,4 +86,17 @@ private fun createBossBar(player: Player): KeyedBossBar {
         BarColor.WHITE,
         BarStyle.SOLID
     )
+}
+
+fun OfflinePlayer.isInBuyback() =
+    Bukkit.getWorld(WORLD_NAME)
+        ?.getData(NamespaceKeyManager.getKey(PLUGIN_NAMESPACE, "${this.name?.lowercase()}-in-buyback"), PersistentDataType.BOOLEAN)
+        ?: false
+
+fun OfflinePlayer.setIsInBuyback(isInBuyback: Boolean) {
+    Bukkit.getWorld(WORLD_NAME)?.setData(
+        NamespaceKeyManager.getKey(PLUGIN_NAMESPACE, "${this.name?.lowercase()}-in-buyback"),
+        PersistentDataType.BOOLEAN,
+        isInBuyback
+    ) ?: false
 }
