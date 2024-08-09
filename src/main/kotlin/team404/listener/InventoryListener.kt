@@ -163,6 +163,8 @@ class InventoryListener(plugin: Plugin) : Listener {
                         }
                     reviver.sendMessage(Component.text(YOU_ARE_FREE).color(TextColor.fromHexString(GOLDEN_HEX)))
                 } else {
+                    reviver.removeBuybackCount()
+                    reviver.removeBuybackTimeLeft()
                     reviver.sendMessage(
                         Component.text(PLAYER_REVIVED.format(playerToSpawnName))
                             .color(TextColor.fromHexString(GREEN_HEX))

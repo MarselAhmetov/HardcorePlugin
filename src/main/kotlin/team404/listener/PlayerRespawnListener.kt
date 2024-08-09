@@ -23,6 +23,7 @@ import team404.service.PlayerRevivalService
 import team404.util.getBuybackCount
 import team404.util.getBuybackTimerBar
 import team404.util.getRespawnMaterialsMultiplier
+import team404.util.isInBuyback
 import team404.util.removeBuybackTimeLeft
 import team404.util.removeRespawnMaterialsMultiplier
 import team404.util.setIsInBuyback
@@ -40,8 +41,7 @@ class PlayerRespawnListener(private val plugin: Plugin) : Listener {
         event.player
             .takeIf { playerRevivalService.playersToSpawn.contains(it.name) }
             ?.also {
-                val buybackCount = it.getBuybackCount() ?: 0
-                if (buybackCount > 0) {
+                if (it.isInBuyback()) {
                     playerRevivalService.buybackPlayer(it)
                 } else {
                     playerRevivalService.respawnPlayer(it)
